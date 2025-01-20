@@ -1,1 +1,1 @@
-# plugin-organization-demo
+# @my-project/plugin-organization
