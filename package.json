@@ -3,6 +3,8 @@
   "version": "1.4.27",
   "main": "dist/server/index.js",
   "dependencies": {},
+  "displayName": "Organization manager demo",
+  "displayName.zh-CN": "组织架构管理 示例",
   "peerDependencies": {
     "@nocobase/client": "1.x",
     "@nocobase/server": "1.x",
