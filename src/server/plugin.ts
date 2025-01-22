@@ -1,4 +1,5 @@
 import { Plugin } from '@nocobase/server';
+import { setDefaultOrganization } from './actions/setDefaultOrganization';
 
 export class PluginOrganizationServer extends Plugin {
   async afterAdd() {}
@@ -8,9 +9,14 @@ export class PluginOrganizationServer extends Plugin {
       name: `pm.${this.name}`,
       actions: ['organization:*', 'app:refresh'],
     });
+
+   
   }
 
-  async beforeLoad() {}
+  async beforeLoad() {
+    this.app.resourcer.registerActionHandler(`users:setDefaultOrganization`, setDefaultOrganization);
+    this.app.acl.allow('users', 'setDefaultOrganization', 'loggedIn');
+  }
 
   async load() {}
 

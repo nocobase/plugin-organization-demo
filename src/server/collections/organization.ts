@@ -13,15 +13,33 @@ export default defineCollection({
   name: 'organization',
   autoGenId: false,
   migrationRules: ['skip'],
-  shared: true,
   fields: [
     {
       type: 'string',
-      name: 'name',
+      name: 'title',
     },
     {
       type: 'text',
       name: 'code',
+      primaryKey: true,
+    },
+    // {
+    //   type: 'hasMany',
+    //   name: 'resources',
+    //   target: 'dataSourcesRolesResources',
+    //   sourceKey: 'name',
+    //   foreignKey: 'organizationName',
+    // },
+    {
+      type: 'belongsToMany',
+      name: 'users',
+      target: 'users',
+      foreignKey: 'organizationName',
+      otherKey: 'userId',
+      onDelete: 'CASCADE',
+      sourceKey: 'code',
+      targetKey: 'id',
+      through: 'organizationUsers',
     },
   ],
 });

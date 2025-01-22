@@ -18,15 +18,12 @@ import {
   Reset,
   Submit,
 } from '@formily/antd-v5';
-import { registerValidateRules } from '@formily/core';
 import { createSchemaField, useField } from '@formily/react';
 import { SchemaComponent, SchemaComponentOptions, useAPIClient } from '@nocobase/client';
-import { Alert, App, Button, Card, Dropdown, Flex, Space, Table, Tag } from 'antd';
+import { Alert, App, Button, Card, Flex, Space, Table } from 'antd';
 import React, { useContext, useState } from 'react';
 import { OrganizationContext } from './OrganizationProvider';
 import { useT } from './locale';
-
-
 
 const SchemaField = createSchemaField({
   components: {
@@ -40,9 +37,9 @@ const SchemaField = createSchemaField({
 const schema = {
   type: 'object',
   properties: {
-    name: {
+    title: {
       type: 'string',
-      title: `{{ t("Name") }}`,
+      title: `{{ t("Title") }}`,
       'x-decorator': 'FormItem',
       'x-component': 'Input',
     },
@@ -63,17 +60,6 @@ export function OrganizationList({ request, setSelectRowKeys }) {
   const api = useAPIClient();
   const { data, loading, refresh } = request || {};
 
-  const typEnum = {
-    default: {
-      label: t('Plain text'),
-      color: 'green',
-    },
-    secret: {
-      label: t('Encrypted'),
-      color: 'red',
-    },
-  };
-
   const resource = api.resource('organization');
 
   const handleDelete = (data) => {
@@ -82,7 +68,7 @@ export function OrganizationList({ request, setSelectRowKeys }) {
       content: t('Are you sure you want to delete it?'),
       async onOk() {
         await resource.destroy({
-          filterByTk: data.name,
+          filterByTk: data.code,
         });
         refresh();
       },
@@ -108,7 +94,7 @@ export function OrganizationList({ request, setSelectRowKeys }) {
               <Submit
                 onSubmit={async (data) => {
                   await api.request({
-                    url: `organization:update?filterByTk=${initialValues.name}`,
+                    url: `organization:update?filterByTk=${initialValues.code}`,
                     method: 'post',
                     data: {
                       ...data,
@@ -134,24 +120,20 @@ export function OrganizationList({ request, setSelectRowKeys }) {
       <Table
         loading={loading}
         size="middle"
-        rowKey={'name'}
+        rowKey={'code'}
         dataSource={data?.data}
         pagination={false}
         columns={[
           {
-            title: t('Name'),
-            dataIndex: 'name',
+            title: t('Title'),
+            dataIndex: 'title',
             ellipsis: true,
           },
+
           {
-            title: t('Type'),
-            dataIndex: 'type',
-            render: (value) => <Tag color={typEnum[value].color}>{typEnum[value].label}</Tag>,
-          },
-          {
-            title: t('Value'),
+            title: t('Code'),
+            dataIndex: 'code',
             ellipsis: true,
-            render: (record) => <div>{record.type === 'default' ? record.value : '******'}</div>,
           },
           {
             title: t('Actions'),
@@ -203,8 +185,8 @@ export function OrganizationPage() {
 
   const filterOptions = [
     {
-      name: 'name',
-      title: t('Name'),
+      name: 'title',
+      title: t('title'),
       operators: [
         { label: '{{t("contains")}}', value: '$includes', selected: true },
         { label: '{{t("does not contain")}}', value: '$notIncludes' },
@@ -213,51 +195,14 @@ export function OrganizationPage() {
       ],
       schema: {
         type: 'string',
-        title: t('Name'),
+        title: t('Title'),
         'x-component': 'Input',
       },
     },
+
     {
-      name: 'type',
-      title: t('Type'),
-      operators: [
-        {
-          label: '{{t("is")}}',
-          value: '$match',
-          selected: true,
-          schema: {
-            'x-component': 'Select',
-            'x-component-props': { mode: 'tags' },
-          },
-        },
-        {
-          label: '{{t("is not")}}',
-          value: '$notMatch',
-          schema: {
-            'x-component': 'Select',
-            'x-component-props': { mode: 'tags' },
-          },
-        },
-      ],
-      schema: {
-        type: 'string',
-        title: t('Type'),
-        'x-component': 'Select',
-        enum: [
-          {
-            value: 'default',
-            label: '{{t("Plain text")}}',
-          },
-          {
-            value: 'secret',
-            label: '{{t("Encrypted")}}',
-          },
-        ],
-      },
-    },
-    {
-      name: 'value',
-      title: t('Value'),
+      name: 'code',
+      title: t('Code'),
       operators: [
         { label: '{{t("contains")}}', value: '$includes', selected: true },
         { label: '{{t("does not contain")}}', value: '$notIncludes' },
@@ -266,7 +211,7 @@ export function OrganizationPage() {
       ],
       schema: {
         type: 'string',
-        title: t('Value'),
+        title: t('Code'),
         'x-component': 'Input',
       },
     },
