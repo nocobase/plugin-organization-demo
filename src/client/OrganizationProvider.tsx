@@ -50,7 +50,28 @@ export const useSwitchOrganization = () => {
   const { data } = useSystemSettings() || {};
   const api = useAPIClient();
   const organizations = useCurrentOrganization();
-  console.log(organizations);
+  console.log(api, data);
+  const { loading: rLoading, data: organizationUsersData } = useRequest(
+    () => {
+      const ids = data.id;
+      return api.request({
+        resource: 'organizationUsers',
+        action: 'get',
+        params: {
+          filter: {
+            userId: 1,
+          },
+        },
+      });
+    },
+    // {
+    //   manual: true,
+    //   onSuccess(res) {
+    //     console.log(res);
+    //   },
+    // },
+  );
+  console.log(organizationUsersData);
   const result = useMemo<MenuProps['items'][0]>(() => {
     return {
       key: 'organization',

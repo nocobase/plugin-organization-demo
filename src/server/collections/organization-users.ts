@@ -16,5 +16,5 @@ export default defineCollection({
     group: 'user',
   },
   migrationRules: ['schema-only', 'overwrite', 'skip'],
-  fields: [{ type: 'boolean', name: 'default' }],
+  fields: [{ type: 'string', name: 'default' }],
 });

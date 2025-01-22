@@ -3,17 +3,12 @@ import { setDefaultOrganization } from './actions/setDefaultOrganization';
 
 export class PluginOrganizationServer extends Plugin {
   async afterAdd() {}
-  registerACL() {
-    this.app.acl.allow('organization', 'list', 'loggedIn');
+
+  async beforeLoad() {
     this.app.acl.registerSnippet({
       name: `pm.${this.name}`,
       actions: ['organization:*', 'app:refresh'],
     });
-
-   
-  }
-
-  async beforeLoad() {
     this.app.resourcer.registerActionHandler(`users:setDefaultOrganization`, setDefaultOrganization);
     this.app.acl.allow('users', 'setDefaultOrganization', 'loggedIn');
   }
