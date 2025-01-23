@@ -297,7 +297,7 @@ export function OrganizationPage() {
             <Button icon={<DeleteOutlined />} onClick={handelBulkDelete}>
               {t('Delete')}
             </Button>
-            <Button icon={<DeleteOutlined />} onClick={handelAddNew}>
+            <Button type='primary'  icon={<DeleteOutlined />} onClick={handelAddNew}>
               {t('Add new')}
             </Button>
           </Space>

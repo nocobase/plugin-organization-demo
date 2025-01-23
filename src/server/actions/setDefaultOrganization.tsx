@@ -26,24 +26,15 @@ export async function setDefaultOrganization(ctx: Context, next: Next) {
     return next();
   }
 
-  const repository = db.getRepository('organizationUsers');
+  const repository = db.getRepository('organization');
 
   await db.sequelize.transaction(async (transaction) => {
     await repository.update({
       filter: {
-        userId: currentUser.id,
+        code: organizationName,
       },
       values: {
-        default: false,
-      },
-      transaction,
-    });
-    await repository.update({
-      filter: {
-        userId: currentUser.id,
-      },
-      values: {
-        default: organizationName,
+        users: { id: currentUser.id },
       },
       transaction,
     });

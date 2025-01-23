@@ -1,5 +1,5 @@
 {
-  "name": "@my-project/plugin-organization",
+  "name": "@nocobase/plugin-organization",
   "version": "1.4.27",
   "main": "dist/server/index.js",
   "dependencies": {},

@@ -25,20 +25,24 @@ const OrganizationContext = createContext<any>({});
 
 const InternalProvider = (props) => {
   const organizationRequest = useRequest<any>({
-    url: 'organization?paginate=false',
+    url: 'organization:list?paginate=false',
   });
-  return <OrganizationContext.Provider value={{ organizationRequest }}>{props.children}</OrganizationContext.Provider>;
+
+  return (
+    <OrganizationContext.Provider value={{ organizationRequest }}>
+      <UserCenterOrganizationProvider>{props.children}</UserCenterOrganizationProvider>
+    </OrganizationContext.Provider>
+  );
 };
 
 const useCurrentOrganization = () => {
-  const organizationRequest = useRequest<any>({
-    url: 'organization?paginate=false',
-  });
+  const { organizationRequest } = useContext(OrganizationContext);
   const { data } = organizationRequest || {};
   return data?.data?.map((v) => {
     return {
       title: v.title,
       code: v.code,
+      organizationUser: v.organizationUser,
     };
   });
 };
@@ -46,32 +50,11 @@ const useCurrentOrganization = () => {
 export const useSwitchOrganization = () => {
   const ctx = useContext(DropdownVisibleContext);
   const [visible, setVisible] = useState(false);
-  const t = useT();
   const { data } = useSystemSettings() || {};
+  const t = useT();
   const api = useAPIClient();
   const organizations = useCurrentOrganization();
-  console.log(api, data);
-  const { loading: rLoading, data: organizationUsersData } = useRequest(
-    () => {
-      const ids = data.id;
-      return api.request({
-        resource: 'organizationUsers',
-        action: 'get',
-        params: {
-          filter: {
-            userId: 1,
-          },
-        },
-      });
-    },
-    // {
-    //   manual: true,
-    //   onSuccess(res) {
-    //     console.log(res);
-    //   },
-    // },
-  );
-  console.log(organizationUsersData);
+  const currentOrganization = organizations?.find?.((v) => v.organizationUser === data?.data?.id);
   const result = useMemo<MenuProps['items'][0]>(() => {
     return {
       key: 'organization',
@@ -88,7 +71,7 @@ export const useSwitchOrganization = () => {
             value: 'code',
           }}
           options={organizations}
-          defaultValue={api.auth.role}
+          defaultValue={currentOrganization?.code}
           onChange={async (organizationName) => {
             await api.resource('users').setDefaultOrganization({ values: { organizationName } });
           }}
@@ -103,12 +86,10 @@ export const useSwitchOrganization = () => {
 const OrganizationProvider = observer(
   (props) => {
     const isAdminPage = useIsAdminPage();
-    const { addMenuItem } = useCurrentUserSettingsMenu();
-    const organizationItem = useSwitchOrganization();
+
     if (!isAdminPage) {
       return <>{props.children}</>;
     }
-    addMenuItem(organizationItem, { after: 'divider_1' });
 
     return <InternalProvider {...props} />;
   },
@@ -118,3 +99,10 @@ const OrganizationProvider = observer(
 );
 
 export { OrganizationContext, OrganizationProvider };
+
+const UserCenterOrganizationProvider = (props) => {
+  const { addMenuItem } = useCurrentUserSettingsMenu();
+  const organizationItem = useSwitchOrganization();
+  addMenuItem(organizationItem, { after: 'divider_1' });
+  return props.children;
+};
