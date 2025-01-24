@@ -47,14 +47,12 @@ const useCurrentOrganization = () => {
   });
 };
 
-export const useSwitchOrganization = () => {
+export const useSwitchOrganization = (currentOrganization) => {
   const ctx = useContext(DropdownVisibleContext);
   const [visible, setVisible] = useState(false);
-  const { data } = useSystemSettings() || {};
   const t = useT();
   const api = useAPIClient();
   const organizations = useCurrentOrganization();
-  const currentOrganization = organizations?.find?.((v) => v.organizationUser === data?.data?.id);
   const result = useMemo<MenuProps['items'][0]>(() => {
     return {
       key: 'organization',
@@ -98,11 +96,20 @@ const OrganizationProvider = observer(
   },
 );
 
-export { OrganizationContext, OrganizationProvider };
+const CurrentOrganizationContext = createContext({});
 
 const UserCenterOrganizationProvider = (props) => {
+  const organizations = useCurrentOrganization();
+  const { data } = useSystemSettings() || {};
+  const currentOrganization = organizations?.find?.((v) => v.organizationUser === data?.data?.id);
   const { addMenuItem } = useCurrentUserSettingsMenu();
-  const organizationItem = useSwitchOrganization();
+  const organizationItem = useSwitchOrganization(currentOrganization);
   addMenuItem(organizationItem, { after: 'divider_1' });
-  return props.children;
+  return (
+    <CurrentOrganizationContext.Provider value={currentOrganization}>
+      {props.children}
+    </CurrentOrganizationContext.Provider>
+  );
 };
+
+export { OrganizationContext, OrganizationProvider, CurrentOrganizationContext };
