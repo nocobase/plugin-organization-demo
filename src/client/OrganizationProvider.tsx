@@ -98,13 +98,14 @@ const OrganizationProvider = observer(
 
 const CurrentOrganizationContext = createContext({});
 
-const UserCenterOrganizationProvider = (props) => {
+export const UserCenterOrganizationProvider = (props) => {
   const organizations = useCurrentOrganization();
   const { data } = useSystemSettings() || {};
   const currentOrganization = organizations?.find?.((v) => v.organizationUser === data?.data?.id);
   const { addMenuItem } = useCurrentUserSettingsMenu();
   const organizationItem = useSwitchOrganization(currentOrganization);
   addMenuItem(organizationItem, { after: 'divider_1' });
+  console.log(currentOrganization);
   return (
     <CurrentOrganizationContext.Provider value={currentOrganization}>
       {props.children}
@@ -112,4 +113,4 @@ const UserCenterOrganizationProvider = (props) => {
   );
 };
 
-export { OrganizationContext, OrganizationProvider, CurrentOrganizationContext };
+export { OrganizationContext, OrganizationProvider, CurrentOrganizationContext ,useCurrentOrganization};

@@ -19,6 +19,7 @@ export class PluginOrganizationClient extends Plugin {
     });
     this.app.addGlobalVar('$organization', useGetCurrentOrganization);
     this.app.use(OrganizationProvider);
+
   }
 }
 
