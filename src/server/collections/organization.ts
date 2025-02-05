@@ -19,17 +19,18 @@ export default defineCollection({
       name: 'title',
     },
     {
-      type: 'text',
+      type: 'string',
       name: 'code',
       primaryKey: true,
     },
     {
-      type: 'belongsTo',
+      type: 'hasMany',
       name: 'users',
       target: 'users',
       foreignKey: 'organizationUser',
       onDelete: 'CASCADE',
       targetKey: 'id',
+      sourceKey:'code'
     },
   ],
 });

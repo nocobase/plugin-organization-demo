@@ -1,7 +1,7 @@
 import { Plugin } from '@nocobase/client';
 import { OrganizationPage } from './OrganizationPage';
 import { OrganizationProvider } from './OrganizationProvider';
-import { useGetCurrentOrganization } from './hook';
+import { useGetCurrentOrganization  } from './hook';
 
 export class PluginOrganizationClient extends Plugin {
   async afterAdd() {

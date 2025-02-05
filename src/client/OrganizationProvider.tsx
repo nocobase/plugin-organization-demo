@@ -16,8 +16,9 @@ import {
   SelectWithTitle,
   useSystemSettings,
   useAPIClient,
+  useApp,
 } from '@nocobase/client';
-import React, { createContext, useMemo, useContext, useState } from 'react';
+import React, { createContext, useMemo, useContext, useState, useEffect } from 'react';
 import { MenuProps } from 'antd';
 import { useT } from './locale';
 
@@ -25,7 +26,7 @@ const OrganizationContext = createContext<any>({});
 
 const InternalProvider = (props) => {
   const organizationRequest = useRequest<any>({
-    url: 'organization:list?paginate=false',
+    url: 'organization:list?paginate=false&appends[]=users',
   });
 
   return (
@@ -42,7 +43,7 @@ const useCurrentOrganization = () => {
     return {
       title: v.title,
       code: v.code,
-      organizationUser: v.organizationUser,
+      users: v.users,
     };
   });
 };
@@ -50,6 +51,7 @@ const useCurrentOrganization = () => {
 export const useSwitchOrganization = (currentOrganization) => {
   const ctx = useContext(DropdownVisibleContext);
   const [visible, setVisible] = useState(false);
+  const { organizationRequest } = useContext(OrganizationContext);
   const t = useT();
   const api = useAPIClient();
   const organizations = useCurrentOrganization();
@@ -72,6 +74,8 @@ export const useSwitchOrganization = (currentOrganization) => {
           defaultValue={currentOrganization?.code}
           onChange={async (organizationName) => {
             await api.resource('users').setDefaultOrganization({ values: { organizationName } });
+            location.reload();
+            window.location.reload();
           }}
         />
       ),
@@ -99,13 +103,18 @@ const OrganizationProvider = observer(
 const CurrentOrganizationContext = createContext({});
 
 export const UserCenterOrganizationProvider = (props) => {
+  const app = useApp();
   const organizations = useCurrentOrganization();
   const { data } = useSystemSettings() || {};
-  const currentOrganization = organizations?.find?.((v) => v.organizationUser === data?.data?.id);
+  const currentOrganization = organizations?.find?.((v) => v.users.find((k) => k.id === data?.data?.id));
   const { addMenuItem } = useCurrentUserSettingsMenu();
   const organizationItem = useSwitchOrganization(currentOrganization);
   addMenuItem(organizationItem, { after: 'divider_1' });
-  console.log(currentOrganization);
+  useEffect(() => {
+    if (currentOrganization) {
+      app.setGlobalVarCtx('$organization', currentOrganization);
+    }
+  }, [currentOrganization, data?.data?.id]);
   return (
     <CurrentOrganizationContext.Provider value={currentOrganization}>
       {props.children}
@@ -113,4 +122,4 @@ export const UserCenterOrganizationProvider = (props) => {
   );
 };
 
-export { OrganizationContext, OrganizationProvider, CurrentOrganizationContext ,useCurrentOrganization};
+export { OrganizationContext, OrganizationProvider, CurrentOrganizationContext, useCurrentOrganization };

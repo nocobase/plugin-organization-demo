@@ -34,7 +34,7 @@ export async function setDefaultOrganization(ctx: Context, next: Next) {
         code: organizationName,
       },
       values: {
-        users: { id: currentUser.id },
+        users: [{ id: currentUser.id }],
       },
       transaction,
     });
