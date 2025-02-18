@@ -8,7 +8,23 @@ export class PluginOrganizationServer extends Plugin {
     this.registerACL();
   }
 
-  async load() {}
+  async getCurrentOrganization(ctx) {
+    console.log(88888,ctx)
+    const {
+      state: { currentUser },
+    } = ctx;
+    console.log(66666,currentUser)
+    const currentOrg =
+      (
+        await this.db.getRepository('organization').findOne({
+          filterByTk: currentUser?.organizationUser,
+        })
+      )?.toJSON() || {};
+    return currentOrg;
+  }
+  async load() {
+    this.app.db.registerGlobalVariables({ $organization: ()=>this.getCurrentOrganization(this) });
+  }
 
   registerACL() {
     this.app.acl.allow('organization', 'list', 'loggedIn');

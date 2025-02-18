@@ -13,13 +13,15 @@ export const useGetCurrentOrganization = () => {
       {
         label: t('Title'),
         value: 'title',
+        title: t('Title'),
+        name: 'title',
       },
       {
         label: t('Code'),
         value: 'code',
+        title: t('Code'),
+        name: 'code',
       },
     ],
   };
 };
-
-
